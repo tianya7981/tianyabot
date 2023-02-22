@@ -1,0 +1,46 @@
+function doPost(e) {
+  var message = JSON.parse(e.postData.contents).message;
+  var chatId = message.chat.id;
+
+  var text = message.text;
+  var photo = message.photo;
+  var sticker = message.sticker;
+  var location = message.location;
+  var reply;
+  
+ if(text === '/start') {
+    reply = "欢迎使用本机器人!";
+    } else if(text === '/help') {
+    reply = "本机器人功能正在完善中!";
+  } else if(text) {
+     reply = "本消息将在30秒后删除：" + text;
+  } else if(photo) {
+    var photoId = photo[photo.length-1].file_id;
+    var url = "https://api.telegram.org/bot5971317977:AAHOqe9wk7gzDBhD_JOXhC2WIlwpAde-Ox0/sendPhoto?chat_id=" + chatId + "&photo=" + photoId;
+    var response = UrlFetchApp.fetch(url);
+    reply = "I received a photo";
+  } else if(sticker) {
+    var stickerId = sticker.file_id;
+    var url = "https://api.telegram.org/bot5971317977:AAHOqe9wk7gzDBhD_JOXhC2WIlwpAde-Ox0/sendSticker?chat_id=" + chatId + "&sticker=" + stickerId;
+    var response = UrlFetchApp.fetch(url);
+    reply = "I received a sticker";
+  } else if(location) {
+    var latitude = location.latitude;
+    var longitude = location.longitude;
+    var url = "https://api.telegram.org/bot5971317977:AAHOqe9wk7gzDBhD_JOXhC2WIlwpAde-Ox0/sendLocation?chat_id=" + chatId + "&latitude=" + latitude + "&longitude=" + longitude;
+    var response = UrlFetchApp.fetch(url);
+    reply = "I received a location";
+  }else{
+    reply = "I don't know what you sent, you can try with other message types";
+  }
+  
+  var url = "https://api.telegram.org/bot5971317977:AAHOqe9wk7gzDBhD_JOXhC2WIlwpAde-Ox0/sendMessage?chat_id=" + chatId + "&text=" + reply;
+  var response = UrlFetchApp.fetch(url);
+
+  var messageId = JSON.parse(response.getContentText()).result.message_id;
+  Utilities.sleep(30000);
+  var deleteUrl = "https://api.telegram.org/bot5971317977:AAHOqe9wk7gzDBhD_JOXhC2WIlwpAde-Ox0/deleteMessage?chat_id=" + chatId + "&message_id=" + messageId;
+  var deleteResponse = UrlFetchApp.fetch(deleteUrl);
+
+ 
+}
